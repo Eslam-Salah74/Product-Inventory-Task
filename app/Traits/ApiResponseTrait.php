@@ -9,9 +9,11 @@ trait ApiResponseTrait
     public function apiResponse($data = null, $message = null, $status = 200)
     {
         $response = [
+            'success' => $status >= 200 && $status < 300,
             'message' => $message,
             'status'  => $status,
         ];
+
         if ($data instanceof LengthAwarePaginator) {
             $response['data'] = $data->items();
             $response['meta'] = [
@@ -25,5 +27,15 @@ trait ApiResponseTrait
         }
 
         return response()->json($response, $status);
+    }
+
+    public function errorResponse($message = 'Error occurred', $status = 400, $errors = [])
+    {
+        return response()->json([
+            'success' => false,
+            'message' => $message,
+            'status'  => $status,
+            'errors'  => $errors,
+        ], $status);
     }
 }

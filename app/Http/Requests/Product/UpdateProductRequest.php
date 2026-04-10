@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Product;
 
+use App\Enums\ProductStatus;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
 
 class UpdateProductRequest extends FormRequest
 {
@@ -11,7 +13,7 @@ class UpdateProductRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,8 +23,16 @@ class UpdateProductRequest extends FormRequest
      */
     public function rules(): array
     {
+        $productId = $this->route('product');
+
         return [
-            //
+            'sku' => ['sometimes', 'string', 'unique:products,sku,' . $productId . ',id'],
+            'name' => ['sometimes', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'price' => ['sometimes', 'numeric', 'min:0'],
+            'stock_quantity' => ['sometimes', 'integer', 'min:0'],
+            'low_stock_threshold' => ['nullable', 'integer', 'min:0'],
+            'status' => ['sometimes', new Enum(ProductStatus::class)],
         ];
     }
 }
